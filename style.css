@@ -1,7 +1,7 @@
 :root {
   --bg: #05070d;
   --panel: rgba(15, 20, 32, 0.82);
-  --panel-border: rgba(119, 189, 255, 0.18);
+  --panel-border: rgba(138, 201, 255, 0.32);
   --text: #d9e7ff;
   --muted: #9eb1cb;
   --accent-cyan: #66d6d6;
@@ -77,23 +77,6 @@ body {
   backdrop-filter: blur(8px);
 }
 
-.top-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.top-set-link {
-  text-decoration: none;
-  color: #d7e8ff;
-  border: 1px solid rgba(143, 191, 247, 0.34);
-  border-radius: 999px;
-  padding: 0.35rem 0.66rem;
-  background: rgba(24, 35, 56, 0.78);
-  font-size: 0.8rem;
-  text-transform: lowercase;
-}
-
 .kicker {
   margin: 0;
   color: var(--muted);
@@ -156,7 +139,7 @@ h1 {
   color: var(--text);
   padding: 0.55rem 0.35rem;
   background: rgba(20, 28, 45, 0.72);
-  border: 1px solid rgba(126, 171, 255, 0.23);
+  border: 1px solid rgba(149, 204, 255, 0.4);
   border-radius: 12px;
   font-size: 0.84rem;
 }
@@ -181,6 +164,85 @@ h1 {
   line-height: 1.35;
 }
 
+.slider {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(160, 208, 250, 0.46);
+  background: rgba(8, 14, 24, 0.6);
+}
+
+.slider-track {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.slide.is-active {
+  opacity: 1;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(175, 214, 250, 0.55);
+  background: rgba(11, 18, 29, 0.58);
+  color: #e3efff;
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-btn.prev {
+  left: 0.45rem;
+}
+
+.slider-btn.next {
+  right: 0.45rem;
+}
+
+.slider-dots {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(7, 12, 20, 0.5);
+}
+
+.slider-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(192, 214, 241, 0.48);
+  cursor: pointer;
+}
+
+.slider-dot.is-active {
+  background: rgba(151, 206, 244, 0.95);
+}
+
 .section {
   margin-bottom: 0.9rem;
 }
@@ -197,7 +259,7 @@ h1 {
 }
 
 .product-card {
-  border: 1px solid rgba(140, 177, 240, 0.22);
+  border: 1px solid rgba(150, 208, 255, 0.34);
   border-radius: 14px;
   padding: 0.8rem;
   background: rgba(11, 17, 28, 0.66);
@@ -228,7 +290,7 @@ h1 {
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  border: 1px solid rgba(133, 189, 255, 0.35);
+  border: 1px solid rgba(151, 206, 255, 0.48);
   background: rgba(28, 38, 61, 0.8);
   cursor: pointer;
   flex-shrink: 0;
@@ -238,9 +300,9 @@ h1 {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 1.02rem;
-  height: 0.55rem;
-  border-radius: 99px;
+  width: 1.08rem;
+  height: 0.62rem;
+  border-radius: 999px;
   border: 2px solid var(--eye-stroke);
   transition: all 180ms ease;
 }
@@ -250,8 +312,8 @@ h1 {
   position: absolute;
   inset: 0;
   margin: auto;
-  width: 0.27rem;
-  height: 0.27rem;
+  width: 0.28rem;
+  height: 0.28rem;
   border-radius: 50%;
   background: var(--eye-stroke);
 }
@@ -260,17 +322,17 @@ h1 {
   content: "";
   position: absolute;
   left: calc(50% - 1px);
-  top: -0.34rem;
+  top: -0.36rem;
   width: 2px;
   height: 0.26rem;
   background: var(--eye-stroke);
   border-radius: 2px;
-  box-shadow: -0.34rem 0.09rem 0 0 var(--eye-stroke), -0.18rem 0.02rem 0 0 var(--eye-stroke),
-    0.18rem 0.02rem 0 0 var(--eye-stroke), 0.34rem 0.09rem 0 0 var(--eye-stroke);
+  box-shadow: -0.36rem 0.1rem 0 0 var(--eye-stroke), -0.2rem 0.02rem 0 0 var(--eye-stroke),
+    0.2rem 0.02rem 0 0 var(--eye-stroke), 0.36rem 0.1rem 0 0 var(--eye-stroke);
 }
 
 .eye-btn.closed .eye-mark {
-  width: 1.02rem;
+  width: 1.08rem;
   height: 0.01rem;
   border: 0;
   border-top: 2px solid var(--eye-stroke);
@@ -282,7 +344,7 @@ h1 {
 }
 
 .eye-btn.closed .eye-mark::after {
-  top: -0.38rem;
+  top: -0.39rem;
 }
 
 .kicker,
@@ -291,7 +353,6 @@ h1,
 .section h2,
 .product-name,
 .option-group legend,
-.top-set-link,
 #set-title {
   animation: soft-tone-shift 8s ease-in-out infinite;
 }
@@ -322,18 +383,8 @@ h1 {
   animation-duration: 9.2s;
 }
 
-.top-set-link,
 #set-title {
   animation-duration: 10s;
-}
-
-.placeholder-img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  border: 1px dashed rgba(143, 194, 245, 0.42);
-  background: linear-gradient(130deg, rgba(72, 92, 133, 0.17), rgba(96, 179, 165, 0.17));
-  margin-bottom: 0.6rem;
 }
 
 .meta {
@@ -346,7 +397,7 @@ h1 {
 .badge {
   font-size: 0.78rem;
   padding: 0.3rem 0.5rem;
-  border: 1px solid rgba(130, 181, 255, 0.29);
+  border: 1px solid rgba(151, 203, 255, 0.4);
   border-radius: 999px;
   color: #d7e8ff;
 }
@@ -357,7 +408,7 @@ h1 {
 }
 
 .option-group {
-  border: 1px solid rgba(108, 168, 236, 0.2);
+  border: 1px solid rgba(138, 190, 247, 0.35);
   border-radius: 10px;
   padding: 0.55rem;
 }
@@ -461,7 +512,7 @@ h1 {
   margin-top: 0.5rem;
   padding: 0.45rem;
   border-radius: 10px;
-  border: 1px solid rgba(141, 178, 233, 0.25);
+  border: 1px solid rgba(153, 199, 243, 0.36);
   background: rgba(10, 15, 27, 0.42);
 }
 
@@ -472,7 +523,7 @@ h1 {
 }
 
 .cart-item {
-  border: 1px solid rgba(143, 194, 245, 0.25);
+  border: 1px solid rgba(157, 210, 255, 0.36);
   border-radius: 10px;
   padding: 0.5rem;
   font-size: 0.8rem;
@@ -510,7 +561,7 @@ h1 {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 999px;
-  border: 1px solid rgba(141, 187, 245, 0.36);
+  border: 1px solid rgba(157, 209, 255, 0.45);
   background: rgba(18, 26, 42, 0.82);
   display: inline-flex;
   align-items: center;
@@ -565,9 +616,10 @@ h1 {
     font-size: 0.76rem;
   }
 
-  .top-set-link {
-    padding: 0.3rem 0.58rem;
-    font-size: 0.75rem;
+  .slider-btn {
+    width: 1.78rem;
+    height: 1.78rem;
+    font-size: 1rem;
   }
 
   .section,
@@ -599,7 +651,6 @@ h1 {
   .section h2,
   .product-name,
   .option-group legend,
-  .top-set-link,
   #set-title {
     animation: none;
   }

@@ -20,44 +20,72 @@
           <p class="kicker">online store of quantum-themed fruit and glowing jellies</p>
           <h1>don't give a quark</h1>
         </div>
-        <div class="top-controls">
-          <a href="#set" class="top-set-link" id="top-set-label">set</a>
-          <button class="eye-btn global-eye" id="global-eye" aria-label="toggle all names" title="toggle all names">
-            <span class="eye-mark"></span>
-          </button>
-        </div>
+        <button class="eye-btn global-eye" id="global-eye" aria-label="toggle all names" title="toggle all names">
+          <span class="eye-mark"></span>
+        </button>
       </header>
 
       <nav class="nav-tabs" aria-label="sections">
-        <a href="#main">main</a>
-        <a href="#catalog">catalog</a>
-        <a href="#about">about</a>
+        <a href="#main" id="main-nav-label">wave functions</a>
+        <a href="#catalog" id="catalog-nav-label">detectors</a>
+        <a href="#about" id="about-nav-label">quark you</a>
         <a href="#albedo" id="albedo-nav-label">albedo</a>
         <a href="#set" id="set-nav-label">set</a>
       </nav>
 
       <section class="hero-card">
-        <p>
-          online store of quantum-themed fruit and glowing jellies
-        </p>
+        <div class="section-head">
+          <h2 id="main-title">wave functions</h2>
+          <button class="eye-btn" id="main-eye" aria-label="toggle wave functions title" title="toggle wave functions title">
+            <span class="eye-mark"></span>
+          </button>
+        </div>
+        <div class="slider" id="main-slider" aria-label="jelly photo gallery">
+          <div class="slider-track" id="slider-track">
+            <img src="images/20260313_184336.jpg" alt="glowing jelly 1" class="slide is-active" />
+            <img src="images/20260313_182639.jpg" alt="glowing jelly 2" class="slide" />
+            <img src="images/20260313_183830.jpg" alt="glowing jelly 3" class="slide" />
+            <img src="images/20260313_185120.jpg" alt="glowing jelly 4" class="slide" />
+            <img src="images/20260313_185413.jpg" alt="glowing jelly 5" class="slide" />
+          </div>
+          <button class="slider-btn prev" id="slider-prev" aria-label="previous photo">‹</button>
+          <button class="slider-btn next" id="slider-next" aria-label="next photo">›</button>
+          <div class="slider-dots" id="slider-dots" aria-label="photo selection"></div>
+        </div>
       </section>
 
       <section id="catalog" class="section">
-        <h2>catalog</h2>
+        <div class="section-head">
+          <h2 id="catalog-title">detectors</h2>
+          <button class="eye-btn" id="catalog-eye" aria-label="toggle detectors title" title="toggle detectors title">
+            <span class="eye-mark"></span>
+          </button>
+        </div>
         <div id="products" class="products"></div>
       </section>
 
       <section id="about" class="section about">
-        <h2>about</h2>
+        <div class="section-head">
+          <h2 id="about-title">quark you</h2>
+          <button class="eye-btn" id="about-eye" aria-label="toggle quark you title" title="toggle quark you title">
+            <span class="eye-mark"></span>
+          </button>
+        </div>
         <ul class="info-list">
-          <li>don't give a quark is an online store of quantum-themed fruit and glowing jellies</li>
-          <li>all jellies are completely natural, safe to eat and handmade</li>
+          <li><strong>are they edible?</strong> yes, they are edible, handmade and safe to eat.</li>
+          <li><strong>how do they glow?</strong> uv light activates vitamin b2 for yellow-green glow or quinine for blue glow.</li>
+          <li><strong>what are they made of?</strong> they are made with agar-agar and fruit versions use freeze-dried fruit powder.</li>
+          <li><strong>how can i see the glow?</strong> use the small uv flashlight included with glowing jellies.</li>
           <li>
-            the glow is produced by exposing the vitamin b2 (yellow-green glow) or quinine
-            (blue glow) contained in the jellies to uv light
+            <strong>how will they be delivered?</strong> delivery is provided by
+            <a href="https://www.packeta.com" target="_blank" rel="noopener noreferrer">packeta</a>
+            (pickup is available in bratislava).
           </li>
-          <li>glowing jellies come with a small uv flashlight</li>
         </ul>
+        <p class="FAQ-outro">
+          if you have any questions,
+          <a href="mailto:dontgiveaquark@gmail.com">email me</a>
+        </p>
       </section>
 
       <section id="albedo" class="section albedo">
@@ -80,8 +108,6 @@
           <li>you can stretch out time and think as much as needed</li>
           <li>if the answer is correct, you'll receive a 1-time promo code</li>
         </ul>
-        <div class="placeholder-img" aria-label="photo placeholder"></div>
-
         <h3>rules</h3>
         <ul class="info-list">
           <li>each subsequent number is obtained using the previous number only</li>

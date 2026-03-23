@@ -15,7 +15,7 @@ const vocabulary = {
     obscura: "glowing flower jellies",
     synthesis: "sour fruit jellies",
     hawkingRadiation: "fruit jellies in dark chocolate with glowing flower ones",
-    learnedHelplessness: "glowing flower jellies in chocolate",
+    learnedHelplessness: "glowing flower jellies in dark chocolate",
     hadronField: "fruit jellies with plant seeds",
     colorGlassCondensate: "glowing flower syrup",
   },
@@ -131,12 +131,29 @@ const products = [
   },
 ];
 
+const productSpecs = {
+  vacuum: { price: "7,40 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
+  obscura: { price: "7,20 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
+  synthesis: { price: "7,50 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
+  hawkingRadiation: { price: "8,90 €", baseWeight: "1,57·10^35 ev", openWeight: "280 g" },
+  learnedHelplessness: { price: "9,30 €", baseWeight: "1,86·10^35 ev", openWeight: "330 g" },
+  hadronField: { price: "7,80 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
+  colorGlassCondensate: { price: "7,90 €", baseWeight: "1,8·10^35 ev", openWeight: "250 ml" },
+};
+
 const state = {
   globalOpen: false,
   albedoOpen: false,
+  sectionOpen: {
+    main: false,
+    catalog: false,
+    about: false,
+  },
   productOpen: Object.fromEntries(products.map((p) => [p.id, false])),
   expandedProducts: Object.fromEntries(products.map((p) => [p.id, false])),
   cart: [],
+  sliderIndex: 0,
+  sliderTimer: null,
 };
 
 function resolveText(key, isOpen, mapName) {
@@ -153,6 +170,21 @@ function getEmptySetWord() {
   return state.globalOpen ? "empty bag" : "empty set";
 }
 
+function getProductWeight(productId, isOpen) {
+  const spec = productSpecs[productId];
+  return isOpen ? spec.openWeight : spec.baseWeight;
+}
+
+function getSectionLabel(sectionId, isOpen) {
+  if (sectionId === "main") {
+    return isOpen ? "main" : "wave functions";
+  }
+  if (sectionId === "catalog") {
+    return isOpen ? "catalog" : "detectors";
+  }
+  return isOpen ? "FAQ" : "quark you";
+}
+
 function buildProductCard(product) {
   const card = document.createElement("article");
   card.className = "product-card";
@@ -166,9 +198,8 @@ function buildProductCard(product) {
       </button>
     </div>
     <div class="product-body" hidden>
-      <div class="placeholder-img" aria-label="photo placeholder"></div>
       <div class="meta">
-        <span class="badge">7€</span>
+        <span class="badge price-label"></span>
         <span class="badge weight-label"></span>
       </div>
       <form class="options"></form>
@@ -223,31 +254,40 @@ function buildProductCard(product) {
 
 function applyEyeState() {
   document.getElementById("global-eye").classList.toggle("closed", !state.globalOpen);
-  document.getElementById("albedo-eye").classList.toggle("closed", !(state.globalOpen || state.albedoOpen));
+  document.getElementById("albedo-eye").classList.toggle("closed", !state.albedoOpen);
+  document.getElementById("main-eye").classList.toggle("closed", !state.sectionOpen.main);
+  document.getElementById("catalog-eye").classList.toggle("closed", !state.sectionOpen.catalog);
+  document.getElementById("about-eye").classList.toggle("closed", !state.sectionOpen.about);
 
-  document.getElementById("top-set-label").textContent = getSetWord();
+  document.getElementById("main-title").textContent = getSectionLabel("main", state.sectionOpen.main);
+  document.getElementById("catalog-title").textContent = getSectionLabel("catalog", state.sectionOpen.catalog);
+  document.getElementById("about-title").textContent = getSectionLabel("about", state.sectionOpen.about);
+
+  document.getElementById("main-nav-label").textContent = getSectionLabel("main", state.sectionOpen.main);
+  document.getElementById("catalog-nav-label").textContent = getSectionLabel("catalog", state.sectionOpen.catalog);
+  document.getElementById("about-nav-label").textContent = getSectionLabel("about", state.sectionOpen.about);
+
   document.getElementById("set-nav-label").textContent = getSetWord();
 
-  const albedoTitle = document.getElementById("albedo-title");
-  const albedoNavLabel = document.getElementById("albedo-nav-label");
-  const albedoOn = state.globalOpen || state.albedoOpen;
-
-  albedoTitle.textContent = albedoOn ? "discount" : "albedo";
-  albedoNavLabel.textContent = albedoOn ? "discount" : "albedo";
+  const albedoOn = state.albedoOpen;
+  document.getElementById("albedo-title").textContent = albedoOn ? "discount" : "albedo";
+  document.getElementById("albedo-nav-label").textContent = albedoOn ? "discount" : "albedo";
 
   document.querySelectorAll(".product-card").forEach((card) => {
     const productId = card.dataset.productId;
-    const localOpen = state.globalOpen || state.productOpen[productId];
+    const localOpen = state.productOpen[productId];
     const isExpanded = state.expandedProducts[productId];
+    const spec = productSpecs[productId];
 
     const eye = card.querySelector(".product-eye");
     eye.classList.toggle("closed", !localOpen);
     card.querySelector(".product-body").hidden = !isExpanded;
     card.classList.toggle("expanded", isExpanded);
     card.querySelector(".add-btn").textContent = state.globalOpen ? "add to bag" : "add to set";
+    card.querySelector(".price-label").textContent = spec.price;
 
     card.querySelector(".product-name").textContent = resolveText(productId, localOpen, "product");
-    card.querySelector(".weight-label").textContent = localOpen ? "180 g" : "1,01·10^35 ev";
+    card.querySelector(".weight-label").textContent = getProductWeight(productId, localOpen);
 
     card.querySelectorAll(".option-group").forEach((group) => {
       const groupId = group.dataset.groupId;
@@ -325,7 +365,8 @@ function validateProduct(card, showErrors = true) {
 
 function collectProductSelection(card) {
   const productId = card.dataset.productId;
-  const localOpen = state.globalOpen || state.productOpen[productId];
+  const localOpen = state.productOpen[productId];
+  const spec = productSpecs[productId];
 
   const selected = Array.from(card.querySelectorAll(".option-group")).map((group) => {
     const groupId = group.dataset.groupId;
@@ -342,8 +383,8 @@ function collectProductSelection(card) {
   return {
     id: productId,
     name: resolveText(productId, localOpen, "product"),
-    weight: localOpen ? "180 g" : "1,01·10^35 ev",
-    price: "7€",
+    weight: getProductWeight(productId, localOpen),
+    price: spec.price,
     selected,
   };
 }
@@ -431,18 +472,108 @@ function setupProducts() {
 }
 
 function setupGlobalEyes() {
-  document.getElementById("global-eye").classList.add("closed");
-  document.getElementById("albedo-eye").classList.add("closed");
+  const globalEye = document.getElementById("global-eye");
+  const albedoEye = document.getElementById("albedo-eye");
+  const mainEye = document.getElementById("main-eye");
+  const catalogEye = document.getElementById("catalog-eye");
+  const aboutEye = document.getElementById("about-eye");
 
-  document.getElementById("global-eye").addEventListener("click", () => {
+  globalEye.classList.add("closed");
+  albedoEye.classList.add("closed");
+  mainEye.classList.add("closed");
+  catalogEye.classList.add("closed");
+  aboutEye.classList.add("closed");
+
+  globalEye.addEventListener("click", () => {
     state.globalOpen = !state.globalOpen;
+    state.albedoOpen = state.globalOpen;
+    state.sectionOpen.main = state.globalOpen;
+    state.sectionOpen.catalog = state.globalOpen;
+    state.sectionOpen.about = state.globalOpen;
+    products.forEach((product) => {
+      state.productOpen[product.id] = state.globalOpen;
+    });
     applyEyeState();
   });
 
-  document.getElementById("albedo-eye").addEventListener("click", () => {
+  albedoEye.addEventListener("click", () => {
     state.albedoOpen = !state.albedoOpen;
     applyEyeState();
   });
+
+  mainEye.addEventListener("click", () => {
+    state.sectionOpen.main = !state.sectionOpen.main;
+    applyEyeState();
+  });
+
+  catalogEye.addEventListener("click", () => {
+    state.sectionOpen.catalog = !state.sectionOpen.catalog;
+    applyEyeState();
+  });
+
+  aboutEye.addEventListener("click", () => {
+    state.sectionOpen.about = !state.sectionOpen.about;
+    applyEyeState();
+  });
+}
+
+function renderSlider(index) {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const dots = Array.from(document.querySelectorAll(".slider-dot"));
+
+  slides.forEach((slide, slideIndex) => {
+    slide.classList.toggle("is-active", slideIndex === index);
+  });
+
+  dots.forEach((dot, dotIndex) => {
+    dot.classList.toggle("is-active", dotIndex === index);
+  });
+}
+
+function moveSlider(step) {
+  const slides = document.querySelectorAll(".slide");
+  state.sliderIndex = (state.sliderIndex + step + slides.length) % slides.length;
+  renderSlider(state.sliderIndex);
+}
+
+function restartSliderTimer() {
+  if (state.sliderTimer) {
+    clearInterval(state.sliderTimer);
+  }
+  state.sliderTimer = setInterval(() => {
+    moveSlider(1);
+  }, 4800);
+}
+
+function setupSlider() {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const dotsContainer = document.getElementById("slider-dots");
+
+  slides.forEach((_, index) => {
+    const dot = document.createElement("button");
+    dot.type = "button";
+    dot.className = "slider-dot";
+    dot.setAttribute("aria-label", `show photo ${index + 1}`);
+    dot.addEventListener("click", () => {
+      state.sliderIndex = index;
+      renderSlider(state.sliderIndex);
+      restartSliderTimer();
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  document.getElementById("slider-prev").addEventListener("click", () => {
+    moveSlider(-1);
+    restartSliderTimer();
+  });
+
+  document.getElementById("slider-next").addEventListener("click", () => {
+    moveSlider(1);
+    restartSliderTimer();
+  });
+
+  renderSlider(state.sliderIndex);
+  restartSliderTimer();
 }
 
 function seedParticles() {
@@ -468,6 +599,7 @@ function seedParticles() {
 function boot() {
   setupProducts();
   setupGlobalEyes();
+  setupSlider();
   renderCart();
   seedParticles();
 
