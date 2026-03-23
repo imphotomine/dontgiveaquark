@@ -182,7 +182,7 @@ function getSectionLabel(sectionId, isOpen) {
   if (sectionId === "catalog") {
     return isOpen ? "catalog" : "detectors";
   }
-  return isOpen ? "FAQ" : "quark you";
+  return isOpen ? "faq" : "quark you";
 }
 
 function buildProductCard(product) {
