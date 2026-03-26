@@ -102,7 +102,7 @@
           <li>
             send a photo of your receipt to
             <a href="https://www.instagram.com/dont.give.a.quark?igsh=ZGxsbTh3OTdxcmJq" target="_blank" rel="noopener noreferrer">instagram</a>
-            and write the albedo you want
+            and write the albedo you want (0,10 or 0,15)
           </li>
           <li>you'll get your sequence and figure out the formula and the next number in it</li>
           <li>you can stretch out time and think as much as needed</li>
@@ -111,7 +111,7 @@
         <h3>rules</h3>
         <ul class="info-list">
           <li>each subsequent number is obtained using the previous number only</li>
-          <li>the result may not be an integer, but it should be rounded and used as one</li>
+          <li>the result may not be an integer, but it should be rounded and used as such</li>
           <li>the maximum number of times a number can be used is 7</li>
         </ul>
 
@@ -128,7 +128,7 @@
             (however, you can get another degree, eg. ³⁻³ᐟ³√ = ²√))
           </p>
         </article>
-
+        <p>&nbsp;</p>
         <p>example:</p>
         <p>5, 22, 469, 218614, ...</p>
         <p>formula: n^(n/n,n+n/n)</p>
@@ -142,7 +142,13 @@
       </section>
 
       <section class="section cart" id="set">
-        <h2 id="set-title">empty set</h2>
+        <div class="section-head">
+          <h2 id="set-title">empty set</h2>
+          <button class="eye-btn" id="set-eye" aria-label="toggle set title and cart names" title="toggle set title and cart names">
+            <span class="eye-mark"></span>
+          </button>
+        </div>
+        <p id="cart-total" class="cart-total">total: 0,00 €</p>
         <div id="cart-items" class="cart-items"></div>
         <a
           id="checkout-btn"

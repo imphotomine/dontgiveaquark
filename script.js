@@ -144,6 +144,7 @@ const productSpecs = {
 const state = {
   globalOpen: false,
   albedoOpen: false,
+  setOpen: false,
   sectionOpen: {
     main: false,
     catalog: false,
@@ -167,7 +168,25 @@ function getSetWord() {
 }
 
 function getEmptySetWord() {
-  return state.globalOpen ? "empty bag" : "empty set";
+  return isCartNamesOpen() ? "empty bag" : "empty set";
+}
+
+function getCartWord() {
+  return state.setOpen || state.globalOpen ? "bag" : "set";
+}
+
+function isCartNamesOpen() {
+  return state.setOpen || state.globalOpen;
+}
+
+function parsePrice(priceText) {
+  const normalized = priceText.replace("€", "").replace(/\s/g, "").replace(",", ".");
+  const value = Number(normalized);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function formatEuro(value) {
+  return `${value.toFixed(2).replace(".", ",")} €`;
 }
 
 function getProductWeight(productId, isOpen) {
@@ -177,7 +196,7 @@ function getProductWeight(productId, isOpen) {
 
 function getSectionLabel(sectionId, isOpen) {
   if (sectionId === "main") {
-    return isOpen ? "main" : "wave functions";
+    return isOpen ? "photos" : "wave functions";
   }
   if (sectionId === "catalog") {
     return isOpen ? "catalog" : "detectors";
@@ -258,6 +277,7 @@ function applyEyeState() {
   document.getElementById("main-eye").classList.toggle("closed", !state.sectionOpen.main);
   document.getElementById("catalog-eye").classList.toggle("closed", !state.sectionOpen.catalog);
   document.getElementById("about-eye").classList.toggle("closed", !state.sectionOpen.about);
+  document.getElementById("set-eye").classList.toggle("closed", !state.setOpen);
 
   document.getElementById("main-title").textContent = getSectionLabel("main", state.sectionOpen.main);
   document.getElementById("catalog-title").textContent = getSectionLabel("catalog", state.sectionOpen.catalog);
@@ -365,25 +385,19 @@ function validateProduct(card, showErrors = true) {
 
 function collectProductSelection(card) {
   const productId = card.dataset.productId;
-  const localOpen = state.productOpen[productId];
   const spec = productSpecs[productId];
 
   const selected = Array.from(card.querySelectorAll(".option-group")).map((group) => {
-    const groupId = group.dataset.groupId;
-    const selectedValues = Array.from(group.querySelectorAll("input:checked")).map((input) => {
-      return resolveText(input.value, localOpen, "item");
-    });
+    const selectedValues = Array.from(group.querySelectorAll("input:checked")).map((input) => input.value);
 
     return {
-      label: resolveText(groupId, localOpen, "group"),
+      groupId: group.dataset.groupId,
       values: selectedValues,
     };
   });
 
   return {
     id: productId,
-    name: resolveText(productId, localOpen, "product"),
-    weight: getProductWeight(productId, localOpen),
     price: spec.price,
     selected,
   };
@@ -393,16 +407,20 @@ function renderCart() {
   const title = document.getElementById("set-title");
   const cartNode = document.getElementById("cart-items");
   const checkout = document.getElementById("checkout-btn");
+  const totalNode = document.getElementById("cart-total");
+  const total = state.cart.reduce((sum, item) => sum + parsePrice(item.price), 0);
 
   if (state.cart.length === 0) {
     title.textContent = getEmptySetWord();
     cartNode.innerHTML = "";
+    totalNode.textContent = `total: ${formatEuro(0)}`;
     checkout.classList.add("disabled");
     checkout.setAttribute("aria-disabled", "true");
     return;
   }
 
-  title.textContent = getSetWord();
+  title.textContent = getCartWord();
+  totalNode.textContent = `total: ${formatEuro(total)}`;
   checkout.classList.remove("disabled");
   checkout.setAttribute("aria-disabled", "false");
 
@@ -413,16 +431,38 @@ function renderCart() {
     node.className = "cart-item";
 
     const optionsText = item.selected
-      .map((group) => `${group.label}: ${group.values.join(", ")}`)
+      .map((group) => {
+        if (group.groupId) {
+          const groupLabel = resolveText(group.groupId, isCartNamesOpen(), "group");
+          const valueLabels = group.values
+            .map((valueKey) => resolveText(valueKey, isCartNamesOpen(), "item"))
+            .join(", ");
+          return `${groupLabel}: ${valueLabels}`;
+        }
+
+        return `${group.label}: ${group.values.join(", ")}`;
+      })
       .join(" | ");
 
     node.innerHTML = `
-      <strong>${index + 1}. ${item.name}</strong><br />
-      ${item.price} | ${item.weight}<br />
-      ${optionsText}
+      <strong>${index + 1}. ${resolveText(item.id, isCartNamesOpen(), "product")}</strong><br />
+      ${item.price} | ${getProductWeight(item.id, isCartNamesOpen())}<br />
+      ${optionsText}<br />
+      <button type="button" class="cart-remove" data-index="${index}">remove</button>
     `;
 
     cartNode.appendChild(node);
+  });
+
+  cartNode.querySelectorAll(".cart-remove").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.index);
+      if (!Number.isInteger(index)) {
+        return;
+      }
+      state.cart.splice(index, 1);
+      renderCart();
+    });
   });
 }
 
@@ -477,12 +517,14 @@ function setupGlobalEyes() {
   const mainEye = document.getElementById("main-eye");
   const catalogEye = document.getElementById("catalog-eye");
   const aboutEye = document.getElementById("about-eye");
+  const setEye = document.getElementById("set-eye");
 
   globalEye.classList.add("closed");
   albedoEye.classList.add("closed");
   mainEye.classList.add("closed");
   catalogEye.classList.add("closed");
   aboutEye.classList.add("closed");
+  setEye.classList.add("closed");
 
   globalEye.addEventListener("click", () => {
     state.globalOpen = !state.globalOpen;
@@ -513,6 +555,11 @@ function setupGlobalEyes() {
 
   aboutEye.addEventListener("click", () => {
     state.sectionOpen.about = !state.sectionOpen.about;
+    applyEyeState();
+  });
+
+  setEye.addEventListener("click", () => {
+    state.setOpen = !state.setOpen;
     applyEyeState();
   });
 }
@@ -603,12 +650,64 @@ function boot() {
   renderCart();
   seedParticles();
 
-  document.getElementById("checkout-btn").addEventListener("click", (event) => {
+  // Маппинг товаров на Stripe Price ID (ОБЯЗАТЕЛЬНО ЗАПОЛНИТЕ РЕАЛЬНЫМИ ID)
+  const STRIPE_PRICES = {
+    vacuum: "price_1TErkMDwaKl3xBLLgeszrTGQ", // Замените на реальные ID из Stripe
+    obscura: "price_1TEqO8DwaKl3xBLLvDmgidZy",
+    synthesis: "price_1TEqPFDwaKl3xBLLsiNiLtsN",
+    hawkingRadiation: "price_1TEqQ4DwaKl3xBLLpcV8g4EW",
+    learnedHelplessness: "price_1TEqR2DwaKl3xBLL1ETcIp2p",
+    hadronField: "price_1TErRHDwaKl3xBLLWKaVaZX0",
+    colorGlassCondensate: "price_1TErSDDwaKl3xBLLYoief6ia"
+  };
+
+  document.getElementById("checkout-btn").addEventListener("click", async (event) => {
+    event.preventDefault(); // Отменяем стандартный переход по ссылке
+
     if (state.cart.length === 0) {
-      event.preventDefault();
       return;
     }
-    window.open(INSTAGRAM_URL, "_blank", "noopener");
+
+    // Подготовка списка товаров для Stripe
+    const stripeGroups = {};
+    
+    state.cart.forEach((item) => {
+      const priceId = STRIPE_PRICES[item.id];
+      if (!priceId) {
+        console.warn(`Price ID не найден для товара: ${item.id}`);
+        return;
+      }
+      
+      if (stripeGroups[priceId]) {
+        stripeGroups[priceId].quantity += 1;
+      } else {
+        stripeGroups[priceId] = { price: priceId, quantity: 1 };
+      }
+    });
+
+    const cartForStripe = Object.values(stripeGroups);
+
+    try {
+      // Отправляем запрос к нашему API
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(cartForStripe)
+      });
+
+      const data = await response.json();
+      
+      // Перенаправляем на Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Ошибка: Stripe не вернул URL", data);
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+    }
   });
 }
 
