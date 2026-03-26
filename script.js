@@ -643,10 +643,26 @@ function seedParticles() {
   }
 }
 
+function setupPressFeedback() {
+  const pressableNodes = Array.from(document.querySelectorAll(".add-btn, #checkout-btn"));
+
+  pressableNodes.forEach((node) => {
+    const addPressed = () => node.classList.add("is-pressed");
+    const removePressed = () => node.classList.remove("is-pressed");
+
+    node.addEventListener("pointerdown", addPressed);
+    node.addEventListener("pointerup", removePressed);
+    node.addEventListener("pointerleave", removePressed);
+    node.addEventListener("pointercancel", removePressed);
+    node.addEventListener("blur", removePressed);
+  });
+}
+
 function boot() {
   setupProducts();
   setupGlobalEyes();
   setupSlider();
+  setupPressFeedback();
   renderCart();
   seedParticles();
 
@@ -687,24 +703,6 @@ function boot() {
 
     const cartForStripe = Object.values(stripeGroups);
 
-    // Собираем полное описание заказа со всеми выбранными вкусами и опциями
-    const orderDetails = state.cart.map((item, index) => {
-      const name = resolveText(item.id, isCartNamesOpen(), "product");
-      const optionsText = item.selected
-        .map((group) => {
-          if (group.groupId) {
-            const groupLabel = resolveText(group.groupId, isCartNamesOpen(), "group");
-            const valueLabels = group.values
-              .map((valueKey) => resolveText(valueKey, isCartNamesOpen(), "item"))
-              .join(", ");
-            return `${groupLabel}: ${valueLabels}`;
-          }
-          return `${group.label}: ${group.values.join(", ")}`;
-        })
-        .join("; ");
-      return `${index + 1}. ${name} (${optionsText})`;
-    }).join("\n");
-
     try {
       // Отправляем запрос к нашему API
       const response = await fetch("/api/create-checkout-session", {
@@ -712,10 +710,7 @@ function boot() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          lineItems: cartForStripe,
-          orderDetails: orderDetails
-        })
+        body: JSON.stringify(cartForStripe)
       });
 
       const data = await response.json();
