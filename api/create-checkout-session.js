@@ -10,19 +10,22 @@ export default async function handler(req, res) {
     return res.status(405).end();
   }
 
-  const { lineItems, orderDetails } = req.body;
+  const cart = req.body;
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    line_items: lineItems,
+    line_items: cart,
     allow_promotion_codes: true,
-    payment_intent_data: {
-      description: orderDetails ? orderDetails.substring(0, 1000) : "Cart details"
-    },
-    metadata: {
-      details: orderDetails ? orderDetails.substring(0, 500) : ""
-    },
     custom_fields: [
+      {
+        key: "name_surname",
+        label: {
+          type: "custom",
+          custom: "Name and Surname"
+        },
+        type: "text",
+        optional: false
+      },
       {
         key: "packeta_address",
         label: {
