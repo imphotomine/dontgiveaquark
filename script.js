@@ -687,6 +687,24 @@ function boot() {
 
     const cartForStripe = Object.values(stripeGroups);
 
+    // Собираем полное описание заказа со всеми выбранными вкусами и опциями
+    const orderDetails = state.cart.map((item, index) => {
+      const name = resolveText(item.id, isCartNamesOpen(), "product");
+      const optionsText = item.selected
+        .map((group) => {
+          if (group.groupId) {
+            const groupLabel = resolveText(group.groupId, isCartNamesOpen(), "group");
+            const valueLabels = group.values
+              .map((valueKey) => resolveText(valueKey, isCartNamesOpen(), "item"))
+              .join(", ");
+            return `${groupLabel}: ${valueLabels}`;
+          }
+          return `${group.label}: ${group.values.join(", ")}`;
+        })
+        .join("; ");
+      return `${index + 1}. ${name} (${optionsText})`;
+    }).join("\n");
+
     try {
       // Отправляем запрос к нашему API
       const response = await fetch("/api/create-checkout-session", {
@@ -694,7 +712,10 @@ function boot() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(cartForStripe)
+        body: JSON.stringify({
+          lineItems: cartForStripe,
+          orderDetails: orderDetails
+        })
       });
 
       const data = await response.json();
