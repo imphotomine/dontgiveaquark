@@ -86,7 +86,7 @@ body {
 .brand-logo {
   width: 2.7rem;
   height: 2.7rem;
-  border-radius: 0.75rem;
+  border-radius: 50%;
   object-fit: cover;
   border: 1px solid rgba(154, 210, 255, 0.55);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
@@ -707,7 +707,7 @@ h1 {
   .brand-logo {
     width: 2.35rem;
     height: 2.35rem;
-    border-radius: 0.62rem;
+    border-radius: 50%;
   }
 
   .nav-tabs {
