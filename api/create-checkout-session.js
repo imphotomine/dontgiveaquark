@@ -36,8 +36,8 @@ export default async function handler(req, res) {
         optional: false
       },
     ],
-    success_url: "https://your-site.vercel.app/success",
-    cancel_url: "https://your-site.vercel.app/cart"
+    success_url: "https://dontgiveaquark.icu",
+    cancel_url: "https://dontgiveaquark.icu"
   });
 
   res.status(200).json({ url: session.url });
