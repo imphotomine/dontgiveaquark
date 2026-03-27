@@ -27,23 +27,14 @@ export default async function handler(req, res) {
         optional: false
       },
       {
-        key: "packeta_address",
+        key: "packeta_address_and_city",
         label: {
           type: "custom",
-          custom: "Packeta address"
+          custom: "Packeta address and city (Example 4, Example)"
         },
         type: "text",
         optional: false
       },
-      {
-        key: "city",
-        label: {
-          type: "custom",
-          custom: "City"
-        },
-        type: "text",
-        optional: false
-      }
     ],
     success_url: "https://your-site.vercel.app/success",
     cancel_url: "https://your-site.vercel.app/cart"
