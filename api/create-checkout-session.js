@@ -30,7 +30,7 @@ export default async function handler(req, res) {
         key: "packeta_address_and_city",
         label: {
           type: "custom",
-          custom: "Packeta address and city (Example 4, Example)"
+          custom: "Packeta address and city"
         },
         type: "text",
         optional: false
