@@ -30,10 +30,10 @@ export default async function handler(req, res) {
         key: "packeta_address_and_city",
         label: {
           type: "custom",
-          custom: "Packeta address and city (or write "pickup")
+          custom: "Packeta address and city (or write 'pickup')"
         },
         type: "text",
-        optional: true
+        optional: false
       },
     ],
     success_url: "https://dontgiveaquark.icu",
