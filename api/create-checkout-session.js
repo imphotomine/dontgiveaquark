@@ -27,13 +27,34 @@ export default async function handler(req, res) {
         optional: false
       },
       {
+        key: "delivery_method",
+        label: {
+          type: "custom",
+          custom: "Delivery Method"
+        },
+        type: "dropdown",
+        dropdown: {
+          options: [
+            {
+              label: "Packeta",
+              value: "packeta"
+            },
+            {
+              label: "Pickup in Bratislava (Kmeťovo nám. 4-5)",
+              value: "pickup"
+            }
+          ]
+        },
+        optional: false
+      },
+      {
         key: "packeta_address_and_city",
         label: {
           type: "custom",
-          custom: "Packeta address and city"
+          custom: "Packeta address (leave empty if Pickup)"
         },
         type: "text",
-        optional: false
+        optional: true
       },
     ],
     success_url: "https://dontgiveaquark.icu",
