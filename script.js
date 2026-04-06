@@ -13,11 +13,11 @@ const vocabulary = {
   },
   productAlt: {
     vacuum: "fruit and glowing jellies",
-    obscura: "glowing jellies",
+    obscura: "glowing flower jellies",
     synthesis: "sour fruit jellies",
     exoticMatter: "ethnobotanical jellies with \"dream herbs\"",
     hawkingRadiation: "fruit jellies in dark chocolate with glowing flower ones",
-    learnedHelplessness: "glowing jellies in dark chocolate",
+    learnedHelplessness: "glowing flower jellies in dark chocolate",
     hadronField: "fruit jellies with plant seeds",
     colorGlassCondensate: "glowing flower syrup",
   },
