@@ -5,17 +5,19 @@ const vocabulary = {
     vacuum: "vacuum",
     obscura: "obscura",
     synthesis: "synthesis",
+    exoticMatter: "exotic matter",
     hawkingRadiation: "hawking radiation",
     learnedHelplessness: "learned helplessness",
     hadronField: "hadron field",
     colorGlassCondensate: "color glass condensate",
   },
   productAlt: {
-    vacuum: "fruit and glowing flower jellies",
-    obscura: "glowing flower jellies",
+    vacuum: "fruit and glowing jellies",
+    obscura: "glowing jellies",
     synthesis: "sour fruit jellies",
+    exoticMatter: "ethnobotanical jellies with \"dream herbs\"",
     hawkingRadiation: "fruit jellies in dark chocolate with glowing flower ones",
-    learnedHelplessness: "glowing flower jellies in dark chocolate",
+    learnedHelplessness: "glowing jellies in dark chocolate",
     hadronField: "fruit jellies with plant seeds",
     colorGlassCondensate: "glowing flower syrup",
   },
@@ -24,19 +26,21 @@ const vocabulary = {
     two: "flavour of photons",
     three: "photon spectrum",
     four: "quark flavour",
+    five: "exotic flavour",
   },
   groupAlt: {
     one: "fruit jellies flavour",
-    two: "glowing flower jellies flavour",
+    two: "glowing jellies flavour",
     three: "colour of the glow of flower jellies",
     four: "type of seeds",
+    five: "type of plant",
   },
   item: {
-    lorenz: "lorenz contraction flavour",
-    eventHorizon: "event horizon flavour",
-    superluminal: "superluminal motion flavour",
-    indistinguishability: "indistinguishability flavour",
-    ultraviolet: "ultraviolet catastrophe flavour",
+    lorenz: "lorenz contraction",
+    eventHorizon: "event horizon",
+    superluminal: "superluminal motion",
+    indistinguishability: "indistinguishability",
+    ultraviolet: "ultraviolet catastrophe",
     divinorum: "divinorum",
     mindBlowing: "mind-blowing",
     breathtaking: "breathtaking",
@@ -50,6 +54,8 @@ const vocabulary = {
     charm: "charm",
     beauty: "beauty",
     truth: "truth",
+    caleaZacatechichi: "calea zacatechichi",
+    entadaRheedii: "entada rheedii",
   },
   itemAlt: {
     lorenz: "banana",
@@ -70,6 +76,8 @@ const vocabulary = {
     charm: "poppy seeds",
     beauty: "flax seeds",
     truth: "amaranth seeds",
+    caleaZacatechichi: "calea zacatechichi",
+    entadaRheedii: "entada rheedii",
   },
 };
 
@@ -78,6 +86,7 @@ const optionDefinitions = {
   two: ["divinorum", "mindBlowing", "breathtaking", "magic", "revitalizing"],
   three: ["yellowGreen", "blue"],
   four: ["up", "down", "strange", "charm", "beauty", "truth"],
+  five: ["caleaZacatechichi", "entadaRheedii"],
 };
 
 const products = [
@@ -99,6 +108,13 @@ const products = [
   {
     id: "synthesis",
     groups: [{ id: "one", type: "checkbox", min: 1, max: 4 }],
+  },
+  {
+    id: "exoticMatter",
+    groups: [
+      { id: "five", type: "radio", min: 1, max: 1 },
+      { id: "two", type: "checkbox", min: 1, max: 2 },
+    ],
   },
   {
     id: "hawkingRadiation",
@@ -135,10 +151,20 @@ const productSpecs = {
   vacuum: { price: "7,40 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
   obscura: { price: "7,20 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
   synthesis: { price: "7,50 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
+  exoticMatter: { price: "10,25 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
   hawkingRadiation: { price: "8,90 €", baseWeight: "1,57·10^35 ev", openWeight: "280 g" },
   learnedHelplessness: { price: "9,30 €", baseWeight: "1,86·10^35 ev", openWeight: "330 g" },
   hadronField: { price: "7,80 €", baseWeight: "1,01·10^35 ev", openWeight: "180 g" },
   colorGlassCondensate: { price: "7,90 €", baseWeight: "1,8·10^35 ev", openWeight: "250 ml" },
+};
+
+const productGroupLabelOverrides = {
+  exoticMatter: {
+    two: {
+      base: "flavour of space",
+      alt: "jellies flavour",
+    },
+  },
 };
 
 const state = {
@@ -192,6 +218,14 @@ function formatEuro(value) {
 function getProductWeight(productId, isOpen) {
   const spec = productSpecs[productId];
   return isOpen ? spec.openWeight : spec.baseWeight;
+}
+
+function getGroupLabel(productId, groupId, isOpen) {
+  const override = productGroupLabelOverrides[productId]?.[groupId];
+  if (override) {
+    return isOpen ? override.alt : override.base;
+  }
+  return resolveText(groupId, isOpen, "group");
 }
 
 function getSectionLabel(sectionId, isOpen) {
@@ -311,7 +345,7 @@ function applyEyeState() {
 
     card.querySelectorAll(".option-group").forEach((group) => {
       const groupId = group.dataset.groupId;
-      group.querySelector(".group-label").textContent = resolveText(groupId, localOpen, "group");
+      group.querySelector(".group-label").textContent = getGroupLabel(productId, groupId, localOpen);
       group.querySelectorAll(".option-item").forEach((item) => {
         const key = item.dataset.itemKey;
         item.querySelector(".item-label").textContent = resolveText(key, localOpen, "item");
@@ -433,7 +467,7 @@ function renderCart() {
     const optionsText = item.selected
       .map((group) => {
         if (group.groupId) {
-          const groupLabel = resolveText(group.groupId, isCartNamesOpen(), "group");
+          const groupLabel = getGroupLabel(item.id, group.groupId, isCartNamesOpen());
           const valueLabels = group.values
             .map((valueKey) => resolveText(valueKey, isCartNamesOpen(), "item"))
             .join(", ");
@@ -671,6 +705,7 @@ function boot() {
     vacuum: "price_1TErkMDwaKl3xBLLgeszrTGQ", // Замените на реальные ID из Stripe
     obscura: "price_1TEqO8DwaKl3xBLLvDmgidZy",
     synthesis: "price_1TEqPFDwaKl3xBLLsiNiLtsN",
+    exoticMatter: "price_1TJEwzDwaKl3xBLLbOddmXCB",
     hawkingRadiation: "price_1TEqQ4DwaKl3xBLLpcV8g4EW",
     learnedHelplessness: "price_1TEqR2DwaKl3xBLL1ETcIp2p",
     hadronField: "price_1TErRHDwaKl3xBLLWKaVaZX0",
